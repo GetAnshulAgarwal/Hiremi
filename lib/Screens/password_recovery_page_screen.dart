@@ -1,18 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart'; // Import for TapGestureRecognizer
-import '../colors.dart';
+import '../colors.dart'; // Ensure this file defines required colors
 
 class PasswordRecoveryPageScreen extends StatefulWidget {
   @override
   _PasswordRecoveryPageScreenState createState() =>
       _PasswordRecoveryPageScreenState();
+
+  // Static constants for strings
+  static const String emailHint = "youremail@gmail.com";
+
+  const PasswordRecoveryPageScreen({super.key}); // Correct usage
 }
 
 class _PasswordRecoveryPageScreenState
     extends State<PasswordRecoveryPageScreen> {
   final _emailController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  bool _isEmailValid = true; // Track email validity
+  bool _isButtonEnabled = true; // Button state
+
+  @override
+  void dispose() {
+    _emailController.dispose(); // Dispose controller to avoid memory leaks
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,22 +36,16 @@ class _PasswordRecoveryPageScreenState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: 32),
+            const SizedBox(height: 32),
 
-            // Hiremi Logo Image (centered at top)
-            Center(
-              child: Image.asset(
-                'assets/images/hireme.png',
-                width: 124.61,
-                height: 56,
-              ),
-            ),
+            // App Logo
+            const AppLogo(),
 
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Forget Password Text
-            Text(
-              "Forget Your Password,",
+            const Text(
+              "Forget Your Password,", // Direct strings (constant-like)
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: 'Poppins',
@@ -50,7 +55,7 @@ class _PasswordRecoveryPageScreenState
                 color: AppColors.textColor,
               ),
             ),
-            Text(
+            const Text(
               "No worries, it happens!",
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -62,20 +67,15 @@ class _PasswordRecoveryPageScreenState
               ),
             ),
 
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Illustration Image
-            Center(
-              child: Image.asset(
-                'assets/images/illustration.png',
-                width: 380,
-                height: 380,
-              ),
-            ),
+            _illustrationImage(),
 
-            SizedBox(height: 2),
+            const SizedBox(height: 20),
 
-            Text(
+            // Email Input Label
+            const Text(
               "Enter Email Address*",
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -87,119 +87,71 @@ class _PasswordRecoveryPageScreenState
               ),
             ),
 
-            // Email Input Field (TextFormField for validation)
+            // Email Input Field
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Form(
-                key: _formKey,
-                child: TextFormField(
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: AppColors
-                        .textFieldFillColor, // Keeps fill color the same
-                    hintText: "youremail@gmail.com",
-                    prefixIcon: Icon(
-                      Icons.email_outlined,
-                      color: AppColors.textColor,
-                    ),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: _isEmailValid
-                            ? AppColors.textFieldBorderColor
-                            : Colors.red, // Only change border color
-                        width: 2.0, // Border width
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      setState(() {
-                        _isEmailValid = false; // Set email as invalid
-                      });
-                      return 'Invalid email or empty';
-                    }
-                    // Regular expression for basic email validation
-                    String pattern =
-                        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
-                    RegExp regExp = RegExp(pattern);
-                    if (!regExp.hasMatch(value)) {
-                      setState(() {
-                        _isEmailValid = false; // Set email as invalid
-                      });
-                      return 'Invalid email or empty';
-                    }
-                    setState(() {
-                      _isEmailValid = true; // Set email as valid
-                    });
-                    return null;
-                  },
-                ),
+              child: EmailInputField(
+                formKey: _formKey,
+                emailController: _emailController,
+                hintText: PasswordRecoveryPageScreen.emailHint, // Fixed usage
               ),
             ),
 
-            SizedBox(height: 10),
+            const SizedBox(height: 20),
 
-            // Instruction Text with clickable "verification code"
+            // Instruction Text
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: RichText(
                 textAlign: TextAlign.center,
                 text: TextSpan(
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 12,
                     color: AppColors.secondaryTextColor,
                   ),
                   children: [
-                    TextSpan(
-                      text: "Enter your email address to receive a ",
-                    ),
+                    const TextSpan(
+                        text: "Enter your email address to receive a "),
                     TextSpan(
                       text: "verification code",
-                      style: TextStyle(
-                        color: Colors.blue, // Blue color for clickable text
+                      style: const TextStyle(
+                        color: Colors.blue,
                         fontWeight: FontWeight.bold,
-                        decoration:
-                            TextDecoration.underline, // Optional underline
+                        decoration: TextDecoration.underline,
                       ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          // Handle the click event for the "verification code" text
-                          print("Verification code clicked");
+                          debugPrint("Verification code clicked");
                         },
                     ),
-                    TextSpan(
-                      text: " in your mailbox.",
-                    ),
+                    const TextSpan(text: " in your mailbox."),
                   ],
                 ),
               ),
             ),
 
-            SizedBox(height: 20),
+            const SizedBox(height: 30),
 
             // Send OTP Button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState?.validate() ?? false) {
-                    // Proceed with OTP sending
-                    // Handle OTP send action here
-                  } else {
-                    // Show error if form is invalid
-                  }
-                },
+                onPressed: _isButtonEnabled
+                    ? () {
+                        if (_formKey.currentState?.validate() ?? false) {
+                          _sendOtp();
+                        }
+                      }
+                    : null, // Disable button if invalid
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryColor,
-                  minimumSize: Size(double.infinity, 50),
+                  minimumSize: const Size(double.infinity, 50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: Text(
+                child: const Text(
                   "Send OTP",
                   style: TextStyle(
                     color: AppColors.buttonTextColor,
@@ -210,9 +162,99 @@ class _PasswordRecoveryPageScreenState
               ),
             ),
 
-            SizedBox(height: 50),
+            const SizedBox(height: 50),
           ],
         ),
+      ),
+    );
+  }
+
+  // Helper to send OTP
+  void _sendOtp() {
+    setState(() {
+      _isButtonEnabled = false;
+    });
+    Future.delayed(const Duration(seconds: 2), () {
+      setState(() {
+        _isButtonEnabled = true;
+      });
+    });
+    debugPrint("OTP sent to ${_emailController.text}");
+  }
+
+  // Illustration Image Widget
+  Widget _illustrationImage() {
+    return Center(
+      child: Image.asset(
+        'assets/images/illustration.png',
+        width: 380,
+        height: 380,
+      ),
+    );
+  }
+}
+
+// Email Input Field with validation
+class EmailInputField extends StatelessWidget {
+  final GlobalKey<FormState> formKey;
+  final TextEditingController emailController;
+  final String hintText; // Passed as a parameter
+
+  const EmailInputField({
+    super.key,
+    required this.formKey,
+    required this.emailController,
+    required this.hintText, // Ensure proper hint text is passed
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: formKey,
+      child: TextFormField(
+        controller: emailController,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: AppColors.textFieldFillColor,
+          hintText: hintText, // Use parameter for hint
+          prefixIcon: const Icon(
+            Icons.account_circle,
+            color: AppColors.primaryColor,
+          ),
+          border: OutlineInputBorder(
+            borderSide: const BorderSide(
+              color: AppColors.textFieldBorderColor,
+              width: 2.0,
+            ),
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Email cannot be empty';
+          }
+          const pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
+          if (!RegExp(pattern).hasMatch(value)) {
+            return 'Invalid email format';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+}
+
+// App Logo Widget
+class AppLogo extends StatelessWidget {
+  const AppLogo({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Image.asset(
+        'assets/images/hireme.png',
+        width: 124.61,
+        height: 56,
       ),
     );
   }
