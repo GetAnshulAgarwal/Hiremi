@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
+import 'otpScreen.dart'; // Import the OTP screen
 
 import '../colors.dart';
 
@@ -27,6 +28,14 @@ class _PasswordRecoveryPageScreenState
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Helper function for responsive text size
+    double responsiveFontSize(double baseFontSize) {
+      return baseFontSize * screenWidth / 375;
+    }
+
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
@@ -38,61 +47,74 @@ class _PasswordRecoveryPageScreenState
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              const SizedBox(height: 32),
+              SizedBox(height: screenHeight * 0.05),
 
               // App Logo
               const AppLogo(),
 
-              const SizedBox(height: 20),
+              SizedBox(height: screenHeight * 0.03),
 
               // Forget Password Text
-              const Text(
+              Text(
                 "Forget Your Password,",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 22,
+                  fontSize: responsiveFontSize(22),
                   fontWeight: FontWeight.w500,
                   height: 1.5,
                   color: AppColors.textColor,
                 ),
               ),
-              const Text(
+              Text(
                 "No worries, it happens!",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 22,
+                  fontSize: responsiveFontSize(22),
                   fontWeight: FontWeight.w400,
                   height: 1.5,
                   color: AppColors.textColor,
                 ),
               ),
 
-              const SizedBox(height: 20),
+              SizedBox(height: screenHeight * 0.03),
 
               // Illustration Image
-              _illustrationImage(),
+              _illustrationImage(screenWidth),
 
-              const SizedBox(height: 20),
+              SizedBox(height: screenHeight * 0.03),
 
               // Email Input Label and Field
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24.0),
-                child: Text(
-                  "Enter Email Address*",
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textColor,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
+                    child: RichText(
+                      text: const TextSpan(
+                        children: [
+                          TextSpan(
+                            text: "Enter Email Address",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          TextSpan(
+                            text: "*",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: AppColors.primaryColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )),
+              SizedBox(height: screenHeight * 0.01),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
                 child: Form(
                   key: _formKey,
                   child: TextFormField(
@@ -102,7 +124,7 @@ class _PasswordRecoveryPageScreenState
                       fillColor: AppColors.textFieldFillColor,
                       hintText: PasswordRecoveryPageScreen.emailHint,
                       prefixIcon: const Icon(
-                        Icons.account_circle, // Email Ico
+                        Icons.account_circle,
                         color: AppColors.primaryColor,
                       ),
                       border: OutlineInputBorder(
@@ -128,17 +150,17 @@ class _PasswordRecoveryPageScreenState
                 ),
               ),
 
-              const SizedBox(height: 20),
+              SizedBox(height: screenHeight * 0.03),
 
               // Instruction Text
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
                 child: RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: 12,
+                      fontSize: responsiveFontSize(12),
                       color: AppColors.secondaryTextColor,
                     ),
                     children: [
@@ -162,38 +184,38 @@ class _PasswordRecoveryPageScreenState
                 ),
               ),
 
-              const SizedBox(height: 30),
+              SizedBox(height: screenHeight * 0.04),
 
               // Send OTP Button
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
                 child: ElevatedButton(
                   onPressed: _isButtonEnabled
                       ? () {
                           if (_formKey.currentState?.validate() ?? false) {
-                            _sendOtp();
+                            _sendOtp(context); // Pass context to navigate
                           }
                         }
                       : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryColor,
-                    minimumSize: const Size(double.infinity, 50),
+                    minimumSize: Size(double.infinity, screenHeight * 0.07),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     "Send OTP",
                     style: TextStyle(
                       color: AppColors.buttonTextColor,
-                      fontSize: 16,
+                      fontSize: responsiveFontSize(16),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
               ),
 
-              const SizedBox(height: 50),
+              SizedBox(height: screenHeight * 0.08),
             ],
           ),
         ),
@@ -201,24 +223,35 @@ class _PasswordRecoveryPageScreenState
     );
   }
 
-  void _sendOtp() {
+  void _sendOtp(BuildContext context) {
+    // Disable the button while processing
     setState(() {
       _isButtonEnabled = false;
     });
-    Future.delayed(const Duration(seconds: 2), () {
+
+    Future.delayed(const Duration(seconds: 0), () {
       setState(() {
         _isButtonEnabled = true;
       });
+
+      // Navigate to OTP screen after sending OTP
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const OTPVerificationScreen(),
+        ),
+      );
     });
+
     debugPrint("OTP sent to ${_emailController.text}");
   }
 
-  Widget _illustrationImage() {
+  Widget _illustrationImage(double screenWidth) {
     return Center(
       child: Image.asset(
         'assets/images/illustration.png',
-        width: 350,
-        height: 350,
+        width: screenWidth * 0.8,
+        height: screenWidth * 0.8,
         fit: BoxFit.contain,
       ),
     );
@@ -230,10 +263,12 @@ class AppLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Image.asset(
       'assets/images/hireme.png',
-      width: 60.08,
-      height: 27,
+      width: screenWidth * 0.16,
+      height: screenWidth * 0.07,
     );
   }
 }
