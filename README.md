@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # hireme
+=======
+# hiremi
+>>>>>>> 5ab99a3666819a5e9fb703eb44f915f369c7de0d
 
 A new Flutter project.
 

@@ -1,6 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
+<<<<<<< HEAD
         android:label="hireme"
+=======
+        android:label="hiremi"
+>>>>>>> 5ab99a3666819a5e9fb703eb44f915f369c7de0d
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
